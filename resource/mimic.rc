@@ -1,0 +1,3 @@
+// Ressource Windows : page d'interface autonome (générée par tools/make_ui.py).
+#include <windows.h>
+101 RCDATA "../ui/mimic_ui.html"
