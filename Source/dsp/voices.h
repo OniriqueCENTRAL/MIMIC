@@ -86,8 +86,9 @@ public:
 		}
 		norm_ = energy > 1e-9f ? 1.0f / std::sqrt (energy * 2.0f) * 1.0f : 1.0f;
 		nextMip_ = 0;
-		state_ = State::Building;
 		ready_ = false;
+		// Capture muette (FREEZE enclenché sur du silence) : pas de table, le synthé garde ses oscillateurs au lieu de se taire.
+		state_ = energy > 1e-9f ? State::Building : State::Idle;
 	}
 
 	// Un mip par appel. Retourne true quand la table est complète (swap fait).
@@ -164,7 +165,7 @@ private:
 
 struct Voice
 {
-	bool active = false, released = false;
+	bool active = false, released = false, sustained = false;
 	int note = -1;
 	float vel = 0.0f, inc = 0.0f, f0 = 0.0f;
 	float phL = 0.0f, phR = 0.0f, phSub = 0.0f;
@@ -174,7 +175,7 @@ struct Voice
 
 	void start (int n, float v, double sr, uint64_t a)
 	{
-		active = true; released = false; note = n; vel = v; age = a;
+		active = true; released = false; sustained = false; note = n; vel = v; age = a;
 		f0 = 440.0f * std::pow (2.0f, (static_cast<float> (n) - 69.0f) / 12.0f);
 		inc = f0 / static_cast<float> (sr);
 		phL = hash01 (static_cast<uint32_t> (a * 2654435761u + 1u));
@@ -204,6 +205,8 @@ public:
 			v = Voice {};
 		counter_ = 0;
 		wtMix_ = 0.0f;
+		bend_ = 1.0f;
+		sustain_ = false;
 	}
 
 	void noteOn (int note, float vel)
@@ -213,9 +216,15 @@ public:
 			if (!v.active) { slot = &v; break; }
 		if (!slot)
 		{
-			slot = &voices_[0];
+			// Vol de voix : d'abord une voix relâchée (la plus éteinte), à défaut la plus ancienne.
 			for (auto& v : voices_)
-				if (v.age < slot->age) slot = &v;
+				if (v.released && (!slot || v.env < slot->env)) slot = &v;
+			if (!slot)
+			{
+				slot = &voices_[0];
+				for (auto& v : voices_)
+					if (v.age < slot->age) slot = &v;
+			}
 		}
 		slot->start (note, vel, sr_, ++counter_);
 	}
@@ -223,7 +232,10 @@ public:
 	{
 		for (auto& v : voices_)
 			if (v.active && !v.released && v.note == note)
-				v.release ();
+			{
+				if (sustain_) v.sustained = true; // pédale tenue : la note sera relâchée avec elle
+				else v.release ();
+			}
 	}
 	void allNotesOff ()
 	{
@@ -231,6 +243,17 @@ public:
 			if (v.active)
 				v.release ();
 	}
+
+	// Pédale de sustain (CC 64) : les notes relâchées pendant qu'elle est tenue le sont quand elle remonte.
+	void setSustain (bool on)
+	{
+		if (sustain_ && !on)
+			for (auto& v : voices_)
+				if (v.active && v.sustained) { v.sustained = false; v.release (); }
+		sustain_ = on;
+	}
+	// Molette de hauteur : rapport de fréquence appliqué à toutes les voix.
+	void setBend (float ratio) { bend_ = clampf (ratio, 0.25f, 4.0f); }
 
 	WavetableSet& table () { return wt_; }
 	void setShape (int s) { shape_ = s; }
@@ -252,7 +275,7 @@ public:
 				v.env *= releaseMul_;
 				if (v.env < 1e-4f) { v.active = false; continue; }
 			}
-			const float dt = v.inc;
+			const float dt = std::min (0.49f, v.inc * bend_);
 			float sL, sR;
 			const float incR = dt * 1.0035f;
 			if (wtMix_ < 0.999f)
@@ -267,7 +290,7 @@ public:
 				sL = sR = 0.0f;
 			if (wtMix_ > 0.001f)
 			{
-				const float wl = wt_.read (v.phL, v.f0, sr_), wr = wt_.read (v.phR, v.f0 * 1.0035f, sr_);
+				const float wl = wt_.read (v.phL, v.f0 * bend_, sr_), wr = wt_.read (v.phR, v.f0 * bend_ * 1.0035f, sr_);
 				sL = lerpf (sL, wl * 1.6f, wtMix_);
 				sR = lerpf (sR, wr * 1.6f, wtMix_);
 			}
@@ -292,7 +315,8 @@ public:
 
 private:
 	double sr_ = 48000.0;
-	float attackInc_ = 0.01f, releaseMul_ = 0.999f, wtMix_ = 0.0f, wtTarget_ = 0.0f;
+	float attackInc_ = 0.01f, releaseMul_ = 0.999f, wtMix_ = 0.0f, wtTarget_ = 0.0f, bend_ = 1.0f;
+	bool sustain_ = false;
 	int shape_ = 0;
 	uint64_t counter_ = 0;
 	std::array<Voice, kMaxVoices> voices_ {};

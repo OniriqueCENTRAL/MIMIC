@@ -1,108 +1,134 @@
-cmake_minimum_required(VERSION 3.25)
-project(MIMIC VERSION 0.1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.22)
 
-set(CMAKE_CXX_STANDARD 20)
+project(Mimic VERSION 1.0.0 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_BUILD_TYPE Release)
+
+if(APPLE)
+    # Universal binary. 10.15 is the first macOS with std::filesystem, which the file loader uses.
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "" FORCE)
 endif()
 
-# --- Steinberg VST3 SDK -------------------------------------------------------
-# Option 1 : -DMIMIC_SDK_DIR=C:/chemin/vst3sdk (SDK déjà cloné, avec ses sous-modules)
-# Option 2 : récupération automatique (FetchContent)
-set(SMTG_ENABLE_VSTGUI_SUPPORT OFF CACHE BOOL "")
-if(WIN32)
-  set(SMTG_USE_STATIC_CRT ON CACHE BOOL "")   # WebView2LoaderStatic.lib est construite en /MT
-endif()
-set(SMTG_ENABLE_VST3_PLUGIN_EXAMPLES OFF CACHE BOOL "")
-set(SMTG_ENABLE_VST3_HOSTING_EXAMPLES OFF CACHE BOOL "")
-set(SMTG_CREATE_PLUGIN_LINK OFF CACHE BOOL "")   # évite d'exiger les droits admin sous Windows
-
-if(MIMIC_SDK_DIR)
-  add_subdirectory(${MIMIC_SDK_DIR} ${CMAKE_BINARY_DIR}/vst3sdk)
+# ---------------------------------------------------------------------------
+# JUCE is looked for next to this file first, then in the PitchBox checkout
+# beside this one, so the plugins of the range can share a single copy.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/JUCE/CMakeLists.txt")
+    set(MIMIC_JUCE_DEFAULT "${CMAKE_CURRENT_SOURCE_DIR}/JUCE")
 else()
-  include(FetchContent)
-  FetchContent_Declare(vst3sdk
-    GIT_REPOSITORY https://github.com/steinbergmedia/vst3sdk.git
-    GIT_TAG        v3.8.1_build_84 # ajuster au tag SDK souhaité
-    GIT_SUBMODULES base cmake pluginterfaces public.sdk
-    GIT_SHALLOW    TRUE)
-  FetchContent_MakeAvailable(vst3sdk)
+    set(MIMIC_JUCE_DEFAULT "${CMAKE_CURRENT_SOURCE_DIR}/../PitchBox/JUCE")
 endif()
 
-smtg_enable_vst3_sdk()
+set(MIMIC_JUCE_DIR "${MIMIC_JUCE_DEFAULT}" CACHE PATH "Path to JUCE")
 
-# --- Plugin -------------------------------------------------------------------
-smtg_add_vst3plugin(MIMIC
-  source/entry.cpp
-  source/audio_file.cpp
-  source/audio_file.h
-  source/dsp/fileplayer.h
-  source/processor.cpp
-  source/processor.h
-  source/controller.cpp
-  source/controller.h
-  source/ids.h
-  source/version.h
-  source/dsp/mimic_dsp.h)
-
-smtg_target_configure_version_file(MIMIC)
-
-# --- Éditeur graphique ---------------------------------------------------------
-target_sources(MIMIC PRIVATE source/editor.h source/editor_bridge.h source/editor_bridge.cpp)
-if(WIN32)
-  # Microsoft Edge WebView2 (SDK récupéré depuis NuGet, aucune installation manuelle)
-  include(FetchContent)
-  FetchContent_Declare(webview2
-    URL https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.2739.15
-    DOWNLOAD_NAME microsoft.web.webview2.zip)
-  FetchContent_MakeAvailable(webview2)
-  if(CMAKE_GENERATOR_PLATFORM MATCHES "ARM64|arm64")
-    set(MIMIC_WV2_ARCH arm64)
-  else()
-    set(MIMIC_WV2_ARCH x64)
-  endif()
-  set(MIMIC_WV2 ${webview2_SOURCE_DIR}/build/native)
-  target_sources(MIMIC PRIVATE source/editor_win.cpp resource/mimic.rc)
-  target_include_directories(MIMIC PRIVATE ${MIMIC_WV2}/include)
-  target_link_libraries(MIMIC PRIVATE ${MIMIC_WV2}/${MIMIC_WV2_ARCH}/WebView2LoaderStatic.lib version advapi32 ole32 shell32 user32 gdi32)
-  set_source_files_properties(resource/mimic.rc PROPERTIES OBJECT_DEPENDS ${CMAKE_SOURCE_DIR}/ui/mimic_ui.html)
-else()
-  target_sources(MIMIC PRIVATE source/editor_other.cpp)
+if(NOT EXISTS "${MIMIC_JUCE_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+        "JUCE not found at ${MIMIC_JUCE_DIR}.\n"
+        "Run:  git clone --depth 1 --branch 9.0.3 https://github.com/juce-framework/JUCE.git")
 endif()
-target_include_directories(MIMIC PRIVATE source)
-target_link_libraries(MIMIC PRIVATE sdk)
+
+add_subdirectory("${MIMIC_JUCE_DIR}" JUCE EXCLUDE_FROM_ALL)
+
+# ---------------------------------------------------------------------------
+# The engine (header-only, in Source/dsp) and the audio file loader, built on
+# their own so the offline tests can link them without dragging in JUCE.
+add_library(mimic_core STATIC
+    Source/audio_file.cpp)
+
+target_include_directories(mimic_core PUBLIC Source)
+set_target_properties(mimic_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(MSVC)
-  target_compile_options(MIMIC PRIVATE $<$<CONFIG:Release>:/O2 /arch:AVX2 /fp:fast>)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64|ARM64")
-  target_compile_options(MIMIC PRIVATE $<$<CONFIG:Release>:-O3 -ffast-math>)
+    # The sources are UTF-8, and MSVC has to be told.
+    target_compile_options(mimic_core PUBLIC /utf-8)
+endif()
+
+# ---------------------------------------------------------------------------
+# The plugin.
+set(MIMIC_FORMATS VST3)
+
+if(APPLE)
+    list(APPEND MIMIC_FORMATS AU)
+endif()
+
+# The system VST3 folder on Windows is under Program Files, which a normal build
+# cannot write to, so installing after the build is opt-in there.
+if(WIN32)
+    option(MIMIC_COPY_AFTER_BUILD "Install the plugin after building" OFF)
 else()
-  target_compile_options(MIMIC PRIVATE $<$<CONFIG:Release>:-O3 -mavx2 -mfma -ffast-math>)
+    option(MIMIC_COPY_AFTER_BUILD "Install the plugin after building" ON)
 endif()
 
-# --- Tests DSP hors-plugin ----------------------------------------------------
-option(MIMIC_BUILD_TESTS "Compiler les tests DSP" ON)
-if(MIMIC_BUILD_TESTS)
-  add_executable(mimic_dsp_test test/dsp_test.cpp)
-  target_include_directories(mimic_dsp_test PRIVATE source)
-  if(MSVC)
-    target_compile_options(mimic_dsp_test PRIVATE /O2 /arch:AVX2)
-  else()
-    target_compile_options(mimic_dsp_test PRIVATE -O2 -mavx2)
-  endif()
-endif()
+juce_add_plugin(Mimic
+    COMPANY_NAME "ONIRIQUE x Abrasion"
+    BUNDLE_ID "com.onirique.abrasion.mimic"
+    PLUGIN_MANUFACTURER_CODE Onrq
+    PLUGIN_CODE Mimc
+    FORMATS ${MIMIC_FORMATS}
+    PRODUCT_NAME "MIMIC"
+    PLUGIN_NAME "MIMIC"
+    # An instrument: notes come in by MIDI, and the sidechain is its only audio input.
+    IS_SYNTH TRUE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT FALSE
+    # Space freezes, the arrows turn the seal under the pointer.
+    EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    VST3_CATEGORIES Instrument Synth
+    AU_MAIN_TYPE kAudioUnitType_MusicDevice
+    COPY_PLUGIN_AFTER_BUILD ${MIMIC_COPY_AFTER_BUILD})
 
-# --- Test de bout en bout de la source fichier (Processor sans hôte) -------------
-if(MIMIC_BUILD_TESTS AND TARGET sdk_hosting)
-  add_executable(mimic_file_test test/file_test.cpp source/processor.cpp source/audio_file.cpp ${vstsdk_SOURCE_DIR}/public.sdk/source/common/memorystream.cpp)
-  target_include_directories(mimic_file_test PRIVATE source)
-  target_link_libraries(mimic_file_test PRIVATE sdk sdk_hosting sdk_common)
-endif()
+# The scenery of the interface: photographs of the original page, layer by layer (tools/bake_ui.py).
+juce_add_binary_data(MimicAssets SOURCES
+    Resources/ui/under.png
+    Resources/ui/over.png
+    Resources/ui/over_on.png)
 
-if(MIMIC_BUILD_TESTS AND TARGET sdk_hosting)
-  add_executable(mimic_bridge_test test/bridge_test.cpp source/controller.cpp source/editor_bridge.cpp source/editor_other.cpp)
-  target_include_directories(mimic_bridge_test PRIVATE source)
-  target_link_libraries(mimic_bridge_test PRIVATE sdk sdk_common)
-endif()
+target_sources(Mimic PRIVATE
+    Source/PluginProcessor.cpp
+    Source/PluginEditor.cpp)
+
+# The licence every Onirique plugin carries: the folder is copied as it is from
+# plugin-license/ in the ONIRIQUE CENTRAL repository, and is only ever changed there.
+include(License/OniriqueLicense.cmake)
+onirique_add_license(Mimic)
+
+target_compile_definitions(Mimic PUBLIC
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0)
+
+target_link_libraries(Mimic
+    PRIVATE
+        mimic_core
+        MimicAssets
+        juce::juce_audio_utils
+        juce::juce_audio_processors
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+
+# ---------------------------------------------------------------------------
+# Offline test: the whole engine without a host. It leaves two demo files in
+# the build folder: the sidechain it used and what MIMIC made of it.
+enable_testing()
+
+add_executable(mimic_dsp_test tests/dsp_test.cpp)
+target_link_libraries(mimic_dsp_test PRIVATE mimic_core)
+add_test(NAME dsp COMMAND mimic_dsp_test "${CMAKE_BINARY_DIR}")
+
+# A development tool, not part of the product: renders the editor to a PNG
+# without a host, and puts the plugin through what a host does to it.
+# Built only when asked for by name.
+add_executable(mimic_snapshot EXCLUDE_FROM_ALL tools/snapshot.cpp)
+
+target_include_directories(mimic_snapshot PRIVATE
+    $<TARGET_PROPERTY:Mimic,INCLUDE_DIRECTORIES>)
+
+target_compile_definitions(mimic_snapshot PRIVATE
+    $<TARGET_PROPERTY:Mimic,COMPILE_DEFINITIONS>)
+
+target_link_libraries(mimic_snapshot PRIVATE Mimic mimic_core MimicAssets)

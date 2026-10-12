@@ -103,6 +103,7 @@ public:
 		w_ = r_ = dp_ = hop_ = 0;
 		mvS_ = 1.0f; lpTick_ = 0;
 		wetS_ = params_.wet;
+		grooveS_ = params_.groove;
 		blendS_ = params_.blend;
 		outS_ = gainFor (params_.output);
 		normS_ = 1.0f;
@@ -133,15 +134,15 @@ public:
 
 	void noteOn (int note, float vel) { voices_.noteOn (note, vel); }
 	void noteOff (int note) { voices_.noteOff (note); }
-	void allNotesOff () { voices_.allNotesOff (); }
+	void allNotesOff () { voices_.setSustain (false); voices_.allNotesOff (); }
+	void setSustain (bool on) { voices_.setSustain (on); }
+	void setPitchBend (float semitones) { voices_.setBend (std::pow (2.0f, semitones / 12.0f)); }
 
 	// scL/scR : sidechain (peuvent être nullptr). Les événements doivent être triés par offset.
 	void process (const float* scL, const float* scR, float* outL, float* outR, int n, const NoteEvent* ev, int nev)
 	{
 		const bool hasSc = scL != nullptr;
 		int ei = 0;
-		const float groove = params_.groove, morphMix = params_.morph;
-		(void) morphMix;
 		const float targetWet = params_.wet, targetOut = gainFor (params_.output);
 		const int mask = N_ - 1;
 		for (int i = 0; i < n; ++i)
@@ -174,6 +175,8 @@ public:
 			float mv = hasSc ? follower_.process (sc) : 1.0f;
 			mv = 1.0f + liveS_ * (mv - 1.0f);
 			mvS_ += aMv_ * (mv - mvS_);
+			grooveS_ += aWet_ * (params_.groove - grooveS_); // GROOVE lissé : une automation ne fait pas de marches
+			const float groove = grooveS_;
 
 			float oL, oR;
 			voices_.render (oL, oR);
@@ -213,10 +216,11 @@ public:
 			float yR = ((dR * (1.0f - wetS_) + wR * wetS_) * gSyn + srR * gSrc) * outS_;
 			if (!(std::fabs (yL) < 8.0f)) yL = yL > 0 ? 8.0f : (yL < 0 ? -8.0f : 0.0f); // protège aussi contre NaN
 			if (!(std::fabs (yR) < 8.0f)) yR = yR > 0 ? 8.0f : (yR < 0 ? -8.0f : 0.0f);
-			outL[i] = yL;
-			outR[i] = yR;
+			// Le vumètre et le témoin de saturation lisent le niveau demandé ; la sortie, elle, ne dépasse jamais 0 dBFS.
 			peakOut_[0] = std::max (peakOut_[0], std::fabs (yL));
 			peakOut_[1] = std::max (peakOut_[1], std::fabs (yR));
+			outL[i] = softLimit (yL);
+			outR[i] = softLimit (yR);
 
 			if (++hop_ >= H_)
 			{
@@ -241,6 +245,18 @@ public:
 
 private:
 	static float gainFor (float n) { return dbToGain (outputDb (n)); }
+
+	// Intact jusqu'à -2,5 dBFS, puis un genou qui s'arrondit vers 0 dBFS : un accord trop fort sature en douceur
+	// au lieu d'envoyer des crêtes au-dessus du plein niveau.
+	static float softLimit (float x)
+	{
+		constexpr float knee = 0.75f;
+		const float a = std::fabs (x);
+		if (a <= knee)
+			return x;
+		const float y = knee + (1.0f - knee) * std::tanh ((a - knee) / (1.0f - knee));
+		return x < 0.0f ? -y : y;
+	}
 
 	void processHop ()
 	{
@@ -365,7 +381,7 @@ private:
 	float liveS_ = 0.0f, aLiveUp_ = 0.01f, aLiveDn_ = 0.001f;
 	int idle_ = 0, idleLimit_ = 36000;
 	bool forceLive_ = false;
-	float synthScale_ = 0.6667f, aMv_ = 0.05f, aWet_ = 0.001f, mvS_ = 1.0f, wetS_ = 0.75f, outS_ = 1.0f, normS_ = 1.0f;
+	float synthScale_ = 0.6667f, aMv_ = 0.05f, aWet_ = 0.001f, mvS_ = 1.0f, wetS_ = 0.75f, outS_ = 1.0f, normS_ = 1.0f, grooveS_ = 0.5f;
 	float peakIn_[2] = {0, 0}, peakOut_[2] = {0, 0}, clip_ = 0.0f;
 	bool frozenNow_ = false;
 	VisFrame vis_;
