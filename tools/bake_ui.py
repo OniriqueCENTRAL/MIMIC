@@ -35,8 +35,9 @@ INJECT = r'''<script>
   if (layer === "over" || layer === "over_on") css += "html,body,.wrap,.viewport,.stage{background:transparent!important}#gl,#fallback,#cavFallback{display:none!important}";
   document.addEventListener("DOMContentLoaded", function () {
     var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
-    if (layer === "over_on") setTimeout(function () {
-      document.querySelectorAll("#src button,#osc button,#freeze").forEach(function (b) { b.setAttribute("aria-pressed", "true"); });
+    // Le décor a tous ses boutons éteints ; la couche des boutons les a tous allumés.
+    if (layer !== "under") setTimeout(function () {
+      document.querySelectorAll("#src button,#osc button,#freeze").forEach(function (b) { b.setAttribute("aria-pressed", String(layer === "over_on")); });
     }, 300);
   });
 })();
