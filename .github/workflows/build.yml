@@ -61,6 +61,24 @@ jobs:
           set -o pipefail
           ctest --test-dir build -C Release --output-on-failure 2>&1 | tee test.log
 
+      # The interface as the plugin draws it, in several states (each source and waveform lit, frozen), kept with
+      # the logs: what a change to the interface looks like, without a DAW.
+      - name: Photograph the interface
+        if: matrix.name == 'Windows'
+        continue-on-error: true
+        shell: bash
+        run: |
+          cmake --build build --config Release --target mimic_snapshot --parallel 2>&1 | tail -3
+          mkdir -p shots
+          S=build/Release/mimic_snapshot.exe
+          [ -f "$S" ] || S=$(find build -name mimic_snapshot.exe | head -1)
+          "$S" shots/repos.png
+          for v in 0 1 2; do "$S" shots/source-$v.png --set input=0 --set source=$v; done
+          for v in 0 1 2 3; do "$S" shots/onde-$v.png --set wave=$v; done
+          "$S" shots/gel.png --freeze
+          "$S" shots/grand-1415x768.png 1415 768 --set source=2 --set wave=3
+          ls -la shots
+
       - name: Check the macOS binaries are universal
         if: matrix.name == 'macOS'
         run: |
@@ -116,6 +134,7 @@ jobs:
             tail -n 150 "$f" > "logs/${f%.log}-tail.txt"
           done
           ls dist > logs/artefacts.txt 2>/dev/null || true
+          [ -d shots ] && cp -r shots logs/ || true
           cd logs
           git init -q
           git config user.name "build"

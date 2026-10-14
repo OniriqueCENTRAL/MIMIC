@@ -29,13 +29,19 @@ Rectangle<float> knobArea (int index)
     return Rectangle<float> (knobX (index) - 68.0f, kKnobY - 92.0f, 136.0f, 160.0f);
 }
 
+// Les boutons des fentes n'ont pas tous la même largeur (VOIX, PERCU, TEXTURE ; les quatre formes d'onde) : leurs
+// bords sont ceux du décor, relevés dans la page d'origine (ui/mimic_ui.html) et ramenés au repère de la fenêtre.
+// Un découpage en parts égales allumait un bout du bouton voisin.
+constexpr float kSourceEdges[] = { 109.0f, 154.3f, 200.0f, 255.0f };
+constexpr float kWaveEdges[] = { 109.0f, 136.8f, 164.9f, 193.2f, 221.0f };
+
 Rectangle<float> buttonArea (int button)
 {
     if (button < 3)
-        return kSourceSlot.withWidth (kSourceSlot.getWidth() / 3.0f).translated ((float) button * kSourceSlot.getWidth() / 3.0f, 0.0f);
+        return { kSourceEdges[button], kSourceSlot.getY(), kSourceEdges[button + 1] - kSourceEdges[button], kSourceSlot.getHeight() };
 
     if (button < kFreezeButton)
-        return kWaveSlot.withWidth (kWaveSlot.getWidth() / 4.0f).translated ((float) (button - 3) * kWaveSlot.getWidth() / 4.0f, 0.0f);
+        return { kWaveEdges[button - 3], kWaveSlot.getY(), kWaveEdges[button - 2] - kWaveEdges[button - 3], kWaveSlot.getHeight() };
 
     return kFreezeSlot;
 }

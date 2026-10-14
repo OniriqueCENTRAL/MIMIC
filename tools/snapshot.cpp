@@ -1,7 +1,8 @@
 // Renders the editor to a PNG without a host, with a voice in the sidechain and a chord held,
 // so a change to the interface can be looked at straight from the build.
 //
-//   mimic_snapshot out.png [width height] [--freeze] [--file some.wav] [--licence]
+//   mimic_snapshot out.png [width height] [--freeze] [--file some.wav] [--licence] [--set id=value ...]
+//       --set   a parameter in its own units before the picture (source=2 wave=1 input=0 …), to see a button lit
 //   mimic_snapshot --selftest [some.wav]    the plugin as a host drives it, without a window
 #include "../Source/PluginEditor.h"
 #include "../Source/PluginProcessor.h"
@@ -85,12 +86,16 @@ void play (mimic::MimicProcessor& processor, const std::vector<float>& sidechain
 
 struct Director final : juce::Timer
 {
-    Director (juce::File destination, int width, int height, bool freeze, const juce::File& clip, bool showLicence)
+    Director (juce::File destination, int width, int height, bool freeze, const juce::File& clip, bool showLicence,
+              const juce::StringArray& settings = {})
         : file (std::move (destination)), freezeAtEnd (freeze)
     {
         processor = makeProcessor();
         processor->setPlayConfigDetails (2, 2, kSr, kBlock);
         processor->prepareToPlay (kSr, kBlock);
+        for (const auto& setting : settings)
+            if (auto* parameter = processor->apvts.getParameter (setting.upToFirstOccurrenceOf ("=", false, false)))
+                parameter->setValueNotifyingHost (parameter->convertTo0to1 (setting.fromFirstOccurrenceOf ("=", false, false).getFloatValue()));
         signal = makeVowel (4.0);
 
         if (clip.existsAsFile())
@@ -300,7 +305,14 @@ int main (int argc, char** argv)
     Director director (juce::File::getCurrentWorkingDirectory().getChildFile (args[0]),
                        sized ? args[1].getIntValue() : mimic::MimicEditor::kBaseWidth,
                        sized ? args[2].getIntValue() : mimic::MimicEditor::kBaseHeight,
-                       args.contains ("--freeze"), clip, args.contains ("--licence"));
+                       args.contains ("--freeze"), clip, args.contains ("--licence"), [&args]
+                       {
+                           juce::StringArray settings;
+                           for (int i = 0; i + 1 < args.size(); ++i)
+                               if (args[i] == "--set")
+                                   settings.add (args[i + 1]);
+                           return settings;
+                       }());
 
     juce::MessageManager::getInstance()->runDispatchLoop();
     return 0;
