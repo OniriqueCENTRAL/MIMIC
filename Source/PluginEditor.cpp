@@ -13,7 +13,7 @@ const Rectangle<float> kMawGlow { 178.5f, 84.0f, 585.0f, 232.0f };
 const Rectangle<float> kSourceSlot { 109.0f, 28.0f, 146.0f, 28.0f };
 const Rectangle<float> kWaveSlot { 109.0f, 64.0f, 112.0f, 24.0f };
 const Rectangle<float> kFreezeSlot { 689.0f, 28.0f, 146.0f, 28.0f };
-const Rectangle<float> kPill { 347.5f, 484.0f, 248.0f, 24.0f };
+const Rectangle<float> kPill { 347.5f, 471.0f, 248.0f, 24.0f };
 constexpr float kMeterLeft = 55.0f, kMeterRight = 849.0f;
 constexpr float kKnobY = 401.0f, kKnobRadius = 60.0f;
 constexpr int kDashes = 28, kMeterSegments = 26;
@@ -202,7 +202,8 @@ MimicEditor::~MimicEditor() { stopTimer(); }
 void MimicEditor::resized()
 {
     const auto s = scale();
-    licenseOverlay->fit (getLocalBounds(), s, (kPill * s).toNearestInt());
+    // The badge's place is given at the base size: the overlay applies the zoom itself.
+    licenseOverlay->fit (getLocalBounds(), s, kPill.toNearestInt());
 }
 
 void MimicEditor::repaintBase (Rectangle<float> area)
