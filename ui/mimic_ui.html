@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIMIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=Grenze+Gotisch:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Runic&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Unbounded:wght@800&family=Fredoka:wght@700&family=Cinzel+Decorative:wght@700;900&family=Grenze+Gotisch:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Runic&display=swap">
 <script>(function(){var w=window.chrome&&window.chrome.webview;if(w||/#plugin/.test(location.hash))document.documentElement.classList.add("plugin");})();</script>
 <!--THREE--><script>/**
  * @license
@@ -67,6 +67,12 @@ button:focus-visible, .dial:focus-visible, .key:focus-visible { outline: 2px sol
 .plate-wrap { left: 378px; top: 60px; width: 269px; height: 96px; filter: drop-shadow(3px 6px 4px rgba(0,0,0,.9)); z-index: 4; }
 .plate-svg { position: absolute; left: 0; top: 0; width: 269px; height: 96px; overflow: visible; }
 .eyebrow { position: absolute; left: 0; right: 0; top: 11px; text-align: center; font: 700 12.5px var(--font-serif); letter-spacing: .16em; color: #a99a98; text-shadow: 0 1px 0 rgba(0,0,0,.95), 0 -1px 0 rgba(255,236,238,.12); }
+/* La marque du partenariat, la même que dans RAW : une capsule lumineuse, ONIRIQUE en capitales espacées, abrasion en minuscules rondes. */
+.xcredit { left: 50%; right: auto; top: 6px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: .45em; padding: 3px 10px 3px 11px; border: 1px solid rgba(226,52,68,.48); border-radius: 999px; background: rgba(28,8,11,.72); box-shadow: 0 0 10px rgba(226,52,68,.24), inset 0 0 9px rgba(226,52,68,.10); white-space: nowrap; letter-spacing: 0; text-shadow: none; }
+.xcredit b { font-weight: 800; font-size: 9.5px; line-height: 1; }
+.xcredit .x-oni { font-family: "Unbounded", "Arial Black", sans-serif; letter-spacing: .14em; color: #f6eeee; text-shadow: 0 0 7px rgba(226,52,68,.7); }
+.xcredit .x-abr { font-family: "Fredoka", "Unbounded", sans-serif; font-weight: 700; font-size: 10.5px; text-transform: lowercase; color: #f6eeee; text-shadow: 0 0 7px rgba(246,238,238,.75); }
+.xcredit i { font-style: normal; font-size: 8.5px; color: #a88f92; }
 .title { position: absolute; left: 0; right: 0; top: 24px; text-align: center; font: 900 56px/1 var(--font-display); letter-spacing: 4px; padding-left: 4px; color: transparent; background: linear-gradient(180deg, #fff4dc 0%, #ffb08a 22%, #ff4a50 48%, #d0202f 72%, #7a0a16 100%); -webkit-background-clip: text; background-clip: text; filter: url(#titleF) drop-shadow(0 2px 0 #120203) drop-shadow(0 0 3px rgba(255,70,60,.9)) drop-shadow(0 0 9px rgba(226,52,68,.7)) drop-shadow(0 0 20px rgba(226,52,68,.4)); animation: flick 3.4s infinite; }
 @keyframes flick { 0%, 100% { opacity: 1; } 47% { opacity: .94; } 52% { opacity: 1; } 64% { opacity: .97; } }
 .prn { position: absolute; top: 20px; font: 400 12px/17px var(--font-rune); color: #7a2a30; text-shadow: 0 1px 0 rgba(255,200,190,.15), 0 -1px 0 #000; }
@@ -228,7 +234,7 @@ button:focus-visible, .dial:focus-visible, .key:focus-visible { outline: 2px sol
           <g fill="none" stroke="#8a747b" stroke-width="1.3" stroke-linecap="round"><path d="M16 22C26 20 30 28 24 32"/><path d="M253 22C243 20 239 28 245 32"/><path d="M18 66C26 70 34 68 36 62"/><path d="M251 66C243 70 235 68 233 62"/></g>
           <g stroke="#000" stroke-width="1"><circle cx="15" cy="12" r="3.2" fill="#6a565c"/><circle cx="254" cy="12" r="3.2" fill="#6a565c"/><circle cx="15" cy="78" r="3.2" fill="#6a565c"/><circle cx="254" cy="78" r="3.2" fill="#6a565c"/></g>
         </svg>
-        <div class="eyebrow">ONIRIQUE × ABRASION</div>
+        <div class="eyebrow xcredit"><b class="x-oni">ONIRIQUE</b><i>×</i><b class="x-abr">abrasion</b></div>
         <div class="title">MIMIC</div>
         <div class="prn l" aria-hidden="true">ᚱ<br>ᛉ<br>ᚹ</div><div class="prn r" aria-hidden="true">ᛏ<br>ᛁ<br>ᛗ</div>
         <span class="plate-gem" style="left:38px"></span><span class="plate-gem" style="right:38px"></span>
