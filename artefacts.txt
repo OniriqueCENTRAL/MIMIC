@@ -1,0 +1,2 @@
+MIMIC-macOS-AU.zip
+MIMIC-macOS-VST3.zip

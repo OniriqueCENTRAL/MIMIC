@@ -1,0 +1,7 @@
+Test project /Users/runner/work/MIMIC/MIMIC/build
+    Start 1: dsp
+1/1 Test #1: dsp ..............................   Passed    3.03 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   3.03 sec
