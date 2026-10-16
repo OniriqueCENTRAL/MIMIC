@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include "OniriqueWindowSize.h"
 #include "BinaryData.h"
 
 namespace mimic
@@ -191,13 +192,20 @@ MimicEditor::MimicEditor (MimicProcessor& p)
     setResizable (true, true);
     getConstrainer()->setFixedAspectRatio ((double) kBaseWidth / (double) kBaseHeight);
     setResizeLimits (kBaseWidth * 3 / 4, kBaseHeight * 3 / 4, kBaseWidth * 17 / 10, kBaseHeight * 17 / 10);
-    setSize (kBaseWidth, kBaseHeight);
+    // taille d'ouverture : la règle commune des plugins ONIRIQUE (OniriqueWindowSize.h)
+    const int w = onirique::window::openingSize ({}, "MIMIC", { kBaseWidth, kBaseHeight }, { kBaseWidth * 3 / 4, kBaseHeight * 3 / 4 },
+                                                 { kBaseWidth * 17 / 10, kBaseHeight * 17 / 10 }).x;
+    setSize (w, juce::roundToInt ((float) w * kBaseHeight / kBaseWidth));
 
     lastTick = Time::getMillisecondCounter();
     startTimerHz (30);
 }
 
-MimicEditor::~MimicEditor() { stopTimer(); }
+MimicEditor::~MimicEditor()
+{
+    stopTimer();
+    onirique::window::rememberOnThisComputer ("MIMIC", getWidth(), getHeight());
+}
 
 void MimicEditor::resized()
 {
