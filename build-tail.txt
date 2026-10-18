@@ -1,0 +1,150 @@
+  BinaryData3.cpp
+  Generating Code...
+  MimicAssets.vcxproj -> D:\a\MIMIC\MIMIC\build\Release\MimicAssets.lib
+  Building Custom Rule D:/a/MIMIC/MIMIC/CMakeLists.txt
+  PluginProcessor.cpp
+  PluginEditor.cpp
+  juce_audio_processors.cpp
+  juce_gui_extra.cpp
+D:\a\MIMIC\MIMIC\Source\OniriqueWindowSize.h(54,28): warning C4996: 'juce::Displays::Display::userArea': Use userBounds [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  (compiling source file '../Source/PluginEditor.cpp')
+  
+D:\a\MIMIC\MIMIC\Source\OniriqueWindowSize.h(52,68): warning C4996: 'juce::Displays::getDisplayForPoint': Prefer the Point<float> overload [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  (compiling source file '../Source/PluginEditor.cpp')
+  
+D:\a\MIMIC\MIMIC\Source\PluginEditor.cpp(253,16): warning C4458: declaration of 'clip' hides class member [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+      D:\a\MIMIC\MIMIC\Source\PluginEditor.h(90,30):
+      see declaration of 'mimic::MimicEditor::clip'
+  
+D:\a\MIMIC\MIMIC\Source\PluginEditor.cpp(609,16): warning C4458: declaration of 'clip' hides class member [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+      D:\a\MIMIC\MIMIC\Source\PluginEditor.h(90,30):
+      see declaration of 'mimic::MimicEditor::clip'
+  
+  juce_gui_basics.cpp
+  juce_gui_basics_2.cpp
+  juce_gui_basics_3.cpp
+  juce_gui_basics_4.cpp
+D:\a\MIMIC\MIMIC\JUCE\modules\juce_gui_basics\juce_gui_basics.cpp(61): warning : This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  juce_gui_basics_5.cpp
+  juce_graphics.cpp
+  juce_graphics_Harfbuzz.cpp
+  juce_events.cpp
+  juce_core.cpp
+  juce_core_CompilationTime.cpp
+  juce_data_structures.cpp
+  juce_audio_processors_headless.cpp
+  juce_audio_processors_headless_ara.cpp
+  juce_audio_processors_headless_lv2_libs.cpp
+  juce_audio_basics.cpp
+  juce_audio_utils.cpp
+  juce_audio_formats.cpp
+  juce_audio_devices.cpp
+  License.cpp
+  LicenseCore.cpp
+  LicenseOverlay.cpp
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244: '=': conversion from 'const _Ty' to '_Ty', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         with [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         [ [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:             _Ty=int [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         ] [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         and [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         [ [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:             _Ty=unsigned char [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24): warning C4244:         ] [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  (compiling source file '../License/LicenseCore.cpp')
+      C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5604,24):
+      the template instantiation context (the oldest one first) is
+          D:\a\MIMIC\MIMIC\License\LicenseCore.cpp(869,10):
+          see reference to function template instantiation 'void std::fill<_Ty*,int>(const _FwdIt,const _FwdIt,const int &)' being compiled
+          with
+          [
+              _Ty=unsigned char,
+              _FwdIt=unsigned char *
+          ]
+  
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37): warning C4244: 'initializing': conversion from 'const _Ty' to 'unsigned char', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37): warning C4244:         with [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37): warning C4244:         [ [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37): warning C4244:             _Ty=int [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37): warning C4244:         ] [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  (compiling source file '../License/LicenseCore.cpp')
+      C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5547,37):
+      the template instantiation context (the oldest one first) is
+          D:\a\MIMIC\MIMIC\License\LicenseCore.cpp(869,10):
+          see reference to function template instantiation 'void std::fill<_Ty*,int>(const _FwdIt,const _FwdIt,const int &)' being compiled
+          with
+          [
+              _Ty=unsigned char,
+              _FwdIt=unsigned char *
+          ]
+          C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.51.36231\include\xutility(5593,22):
+          see reference to function template instantiation 'void std::_Fill_memset<_FwdIt,_Ty>(_CtgIt,const _Ty,const size_t)' being compiled
+          with
+          [
+              _FwdIt=unsigned char *,
+              _Ty=int,
+              _CtgIt=unsigned char *
+          ]
+  
+  tweetnacl.c
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(13,9): warning C4132: '_0': const object should be initialized [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(16,6): warning C4132: 'gf0': const object should be initialized [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(45,21): warning C4244: '=': conversion from 'u32' to 'u8', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(51,35): warning C4244: '=': conversion from 'u64' to 'u8', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(57,3): warning C4018: '<': signed/unsigned mismatch [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(123,17): warning C4295: 'sigma': array is too small to include a terminating null character [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(138,14): warning C4244: '=': conversion from 'u32' to 'u8', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(228,7): warning C4146: unary minus operator applied to unsigned type, result still unsigned [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(234,23): warning C4244: '=': conversion from 'u32' to 'u8', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(316,18): warning C4244: '=': conversion from 'i64' to 'u8', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(410,18): warning C4244: 'function': conversion from 'i64' to 'int', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(411,18): warning C4244: 'function': conversion from 'i64' to 'int', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(430,18): warning C4244: 'function': conversion from 'i64' to 'int', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(431,18): warning C4244: 'function': conversion from 'i64' to 'int', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(548,10): warning C4244: 'return': conversion from 'u64' to 'int', possible loss of data [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(723,3): warning C4018: '<': signed/unsigned mismatch [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+D:\a\MIMIC\MIMIC\License\tweetnacl.c(785,11): warning C4245: '=': conversion from 'int' to 'u64', signed/unsigned mismatch [D:\a\MIMIC\MIMIC\build\Mimic.vcxproj]
+  juce_graphics_Sheenbidi.c
+  juce_graphics_libjpg_1.c
+  juce_graphics_libjpg_2.c
+  juce_graphics_libjpg_3.c
+  juce_graphics_libpng.c
+  juce_graphics_libwebp_dec.c
+  juce_graphics_libwebp_dsp_dec.c
+  juce_graphics_libwebp_dsp_dec_avx2.c
+  juce_graphics_libwebp_dsp_dec_sse41.c
+  juce_graphics_libwebp_dsp_enc.c
+  juce_graphics_libwebp_dsp_enc_avx2.c
+  juce_graphics_libwebp_dsp_enc_sse41.c
+  juce_graphics_libwebp_enc.c
+  juce_graphics_libwebp_sharpyuv.c
+  juce_graphics_libwebp_utils.c
+  juce_graphics_lunasvg.c
+  juce_core_zlib.c
+  juce_audio_formats_flac_1.c
+  juce_audio_formats_flac_2.c
+  juce_audio_formats_ogg.c
+  juce_audio_formats_opus.c
+  juce_audio_formats_opusfile.c
+  Mimic.vcxproj -> D:\a\MIMIC\MIMIC\build\Mimic_artefacts\Release\MIMIC_SharedCode.lib
+  Building Custom Rule D:/a/MIMIC/MIMIC/CMakeLists.txt
+  juce_audio_plugin_client_AAX.cpp
+  juce_audio_plugin_client_AAX_utils.cpp
+  juce_audio_plugin_client_ARA.cpp
+  juce_audio_plugin_client_LV2.cpp
+  juce_audio_plugin_client_Standalone.cpp
+  juce_audio_plugin_client_Unity.cpp
+  juce_audio_plugin_client_VST2.cpp
+  juce_audio_plugin_client_VST3.cpp
+     Creating library D:/a/MIMIC/MIMIC/build/Mimic_artefacts/Release/VST3/MIMIC.lib and object D:/a/MIMIC/MIMIC/build/Mimic_artefacts/Release/VST3/MIMIC.exp
+  Generating code
+D:\a\MIMIC\MIMIC\JUCE\modules\juce_graphics\images\juce_Image.cpp(716): warning C4723: potential divide by 0 [D:\a\MIMIC\MIMIC\build\Mimic_VST3.vcxproj]
+D:\a\MIMIC\MIMIC\JUCE\modules\juce_graphics\images\juce_Image.cpp(716): warning C4723: potential divide by 0 [D:\a\MIMIC\MIMIC\build\Mimic_VST3.vcxproj]
+  Finished generating code
+  Mimic_VST3.vcxproj -> D:\a\MIMIC\MIMIC\build\Mimic_artefacts\Release\VST3\MIMIC.vst3\Contents\x86_64-win\MIMIC.vst3
+  removing moduleinfo.json
+  creating D:/a/MIMIC/MIMIC/build/Mimic_artefacts/Release/VST3/MIMIC.vst3/Contents/Resources/moduleinfo.json
+  Building Custom Rule D:/a/MIMIC/MIMIC/CMakeLists.txt
+  dsp_test.cpp
+  mimic_dsp_test.vcxproj -> D:\a\MIMIC\MIMIC\build\Release\mimic_dsp_test.exe
+  Building Custom Rule D:/a/MIMIC/MIMIC/CMakeLists.txt
